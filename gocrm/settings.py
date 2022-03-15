@@ -177,12 +177,13 @@ if not DEBUG:
 
     ALLOWED_HOSTS = ["*"] # replace with host once known
     
-    EMAIL_HOST = "smtp.mailgun.org"
-    EMAIL_HOST_USER = "postmaster@mg.domain.com"
-    EMAIL_HOST_PASSWORD = ""
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+    EMAIL_HOST = env("EMAIL_HOST")
+    EMAIL_HOST_USER = env("EMAIL_HOST_USER")
+    EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
     EMAIL_USE_TLS = True
-    EMAIL_PORT = 587
-    DEFAULT_FROM_EMAIL = "yourname@domain.com"
+    EMAIL_PORT = env("EMAIL_PORT")
+    DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
 
 
 
