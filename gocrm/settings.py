@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
-import environ
+import environ 
 
 
 
@@ -162,4 +162,19 @@ LOGOUT_REDIRECT_URL = "/"
 CRISPY_TEMPLATE_PACK = 'tailwind'
 CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
 
+
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_HSTS_SECONDS = 31536000 # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    X_FRAME_OPTIONS = "DENY"
+
+    ALLOWED_HOSTS = ["*"] # replace with host once known
+    
 
