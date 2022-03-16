@@ -259,6 +259,29 @@ class CategoryUpdateView(OrganiserAndLoginRequiredMixin,generic.UpdateView):
         return queryset
     
 
+class CategoryDeleteView(OrganiserAndLoginRequiredMixin,generic.DeleteView):
+    template_name = 'leads/category_delete.html'
+    
+
+    def get_queryset(self):
+        user = self.request.user
+        # initial queryset of categories for the entire organisation
+        if user.is_organiser:
+            queryset = Category.objects.filter(
+                organisation=user.userprofile
+            )
+        else:
+            # filter for agent's organisation
+            queryset = Category.objects.filter(
+                organisation=user.agent.organisation,
+            )
+        return queryset
+
+    def get_success_url(self):
+        return reverse('leads:category-list')
+
+
+
 
 class LeadCategoryUpdateView(LoginRequiredMixin, generic.UpdateView):
     template_name = "leads/lead_category_update.html"
