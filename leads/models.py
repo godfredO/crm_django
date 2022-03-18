@@ -14,6 +14,9 @@ class UserProfile(models.Model):
         return self.user.username 
 
 
+class LeadManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset()
 
 class Lead(models.Model):
     first_name = models.CharField(max_length=20)
@@ -26,6 +29,10 @@ class Lead(models.Model):
     date_added = models.DateTimeField(auto_now_add=True)
     phone_number = models.CharField(max_length=20)
     email = models.EmailField()
+    profile_picture = models.ImageField(null=True, blank=True, upload_to="profile_pictures/")
+
+    objects = LeadManager()
+    
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
