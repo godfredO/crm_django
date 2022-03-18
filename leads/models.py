@@ -18,14 +18,6 @@ class LeadManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset()
 
-    def get_age_below_50(self):
-        return self.get_queryset().filter(age__lt=50)
-
-
-class BlankLeadManager(models.Manager):
-    def get_queryset(self):
-        return super().get_queryset().filter(category__isnull=True)
-
 class Lead(models.Model):
     first_name = models.CharField(max_length=20)
     last_name = models.CharField(max_length=20)
@@ -37,9 +29,10 @@ class Lead(models.Model):
     date_added = models.DateTimeField(auto_now_add=True)
     phone_number = models.CharField(max_length=20)
     email = models.EmailField()
+    profile_picture = models.ImageField(null=True, blank=True, upload_to="profile_pictures/")
 
     objects = LeadManager()
-    blank_objects = BlankLeadManager()
+    
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"

@@ -29,11 +29,10 @@ class LeadModelForm(forms.ModelForm):
         )
     
     def clean_first_name(self):
-        pass
-        # data = self.cleaned_data['first_name']
+        data = self.cleaned_data['first_name']
         # if data != "Joe":
         #     raise ValidationError("Your namne is not Joe")
-        # return data
+        return data
 
     def clean(self):
         pass
