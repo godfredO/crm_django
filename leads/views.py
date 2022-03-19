@@ -1,3 +1,4 @@
+import logging
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.http import JsonResponse
@@ -15,6 +16,10 @@ from .forms import (
     )
 from django.urls import reverse
 from agents.mixins import OrganiserAndLoginRequiredMixin
+
+
+logger = logging.getLogger(__name__)
+
 
 class SignUpView(generic.CreateView):
     template_name = "registration/signup.html"
@@ -35,6 +40,7 @@ class LeadListView(LoginRequiredMixin, generic.ListView):
         user = self.request.user
         # initial queryset of leads for the entire organisation
         if user.is_organiser:
+            logger.warning("This is a test warning")
             queryset = Lead.objects.filter(
                 organisation=user.userprofile, 
                 agent__isnull=False
@@ -312,11 +318,15 @@ class LeadJsonView(generic.View):
 
     def get(self, request, *args, **kwargs):
 
-        qs = Lead.objects.all()
+        qs = list(Lead.objects.all().values(
+                "first_name",
+                "last_name", 
+                 "age"
+                 )
+             )
 
         return JsonResponse({
-            "name": "Test",
-            "age": 25
+            "qs" : qs,
         })
 
 # def lead_list(request):
