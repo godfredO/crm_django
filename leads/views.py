@@ -312,11 +312,15 @@ class LeadJsonView(generic.View):
 
     def get(self, request, *args, **kwargs):
 
-        qs = Lead.objects.all()
+        qs = list(Lead.objects.all().values(
+                "first_name",
+                "last_name", 
+                 "age"
+                 )
+             )
 
         return JsonResponse({
-            "name": "Test",
-            "age": 25
+            "qs" : qs,
         })
 
 # def lead_list(request):
