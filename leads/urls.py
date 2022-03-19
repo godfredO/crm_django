@@ -16,5 +16,8 @@ urlpatterns = [
     path('create-category/', views.CategoryCreateView.as_view(), name='category-create'),
     path('categories/<int:pk>/update/', views.CategoryUpdateView.as_view(), name='category-update'),
     path('categories/<int:pk>/delete/', views.CategoryDeleteView.as_view(), name='category-delete'),
-    path('json/', views.LeadJsonView.as_view(), name= 'lead-list-json')
+    path('json/', views.LeadJsonView.as_view(), name= 'lead-list-json'), 
+    path('<int:pk>/followups/create/', views.FollowUpCreateView.as_view(), name="lead-followup-create"),
+    path('followups/<int:pk>/', views.FollowUpUpdateView.as_view(), name="lead-followup-update"),
+    path('followups/<int:pk>/delete/', views.FollowUpDeleteView.as_view(), name="lead-followup-delete"),
 ]
