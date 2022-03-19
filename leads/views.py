@@ -12,7 +12,8 @@ from .forms import (
     CustomUserCreationForm, 
     AssignAgentForm, 
     LeadCategoryUpdateForm, 
-    CategoryModelForm
+    CategoryModelForm,
+    FollowUpModelForm,
     )
 from django.urls import reverse
 from agents.mixins import OrganiserAndLoginRequiredMixin
@@ -328,6 +329,33 @@ class LeadJsonView(generic.View):
         return JsonResponse({
             "qs" : qs,
         })
+
+
+class FollowUpCreateView(LoginRequiredMixin, generic.CreateView):
+    template_name = "leads/followup_create.html"
+    form_class = FollowUpModelForm
+
+    def get_success_url(self):
+        print(self.kwargs)
+        return reverse('leads:detail', kwargs={"pk": self.kwargs["pk"]})
+
+    def get_context_data(self, **kwargs):
+        context = super(FollowUpCreateView,self).get_context_data(**kwargs)
+        context.update({
+            'lead': Lead.objects.get(pk=self.kwargs["pk"])
+        })
+        return context
+    
+    def form_valid(self,form):
+        lead = Lead.objects.get(pk=self.kwargs["pk"])
+        followup = form.save(commit=False)
+        followup.lead = lead
+        followup.save()
+        return super(FollowUpCreateView, self).form_valid(form)
+    
+
+
+
 
 # def lead_list(request):
 #     leads = Lead.objects.all()
