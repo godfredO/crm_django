@@ -1,4 +1,5 @@
 import logging
+import datetime
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.http import JsonResponse
@@ -32,7 +33,49 @@ class SignUpView(generic.CreateView):
 class LandingPageView(generic.TemplateView):
     template_name = "landing.html"
 
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect("dashboard")
+        return super().dispatch(request, *args, **kwargs)
 
+class DashboardView(OrganiserAndLoginRequiredMixin ,generic.TemplateView):
+    template_name = "dashboard.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(DashboardView, self).get_context_data(**kwargs)
+        user = self.request.user
+
+        # How many leads we have in total
+        total_lead_count = Lead.objects.filter(organisation=user.userprofile).count()
+
+        # How many new leads in the 30 days
+        thirty_days_ago = datetime.datetime.today()- datetime.timedelta(days=30)
+        print(thirty_days_ago)
+
+        total_in_past_30=Lead.objects.filter(
+            organisation=user.userprofile,
+            date_added__gte=thirty_days_ago
+            ).count()
+
+
+        # How many converted leads in the 30 days
+        converted_category = Category.objects.get(name="Converted")
+        converted_in_past_30 = Lead.objects.filter(
+            organisation = user.userprofile,
+            category=converted_category,
+            converted_date__gte=thirty_days_ago,
+        ).count()
+
+        
+        context.update({
+            "total_lead_count" : total_lead_count,
+            "total_in_past_30":total_in_past_30,
+            "converted_in_past_30":converted_in_past_30,
+            })
+
+        return context
+
+    
 class LeadListView(LoginRequiredMixin, generic.ListView):
     template_name = 'leads/lead_list.html'
     context_object_name = 'leads'
@@ -313,6 +356,20 @@ class LeadCategoryUpdateView(LoginRequiredMixin, generic.UpdateView):
 
     def get_success_url(self):
         return reverse('leads:detail', kwargs={'pk': self.get_object().id})
+    
+    def form_valid(self,form):
+        lead_before_update = self.get_object()
+        instance = form.save(commit=False)
+        converted_category = Category.objects.get(name="Converted")
+        print(lead_before_update.category)
+        print(instance.category)
+        if form.cleaned_data["category"] == converted_category :
+            # update the date at which lead was converted
+            if self.get_object().category != converted_category:
+                # this lead has now been converted
+                instance.converted_date = datetime.datetime.now()
+        instance.save()
+        return super(LeadCategoryUpdateView, self).form_valid(form)
 
 
 class LeadJsonView(generic.View):
